@@ -4,6 +4,7 @@ import { Text, View, StyleSheet } from 'react-native';
 export default function Header({ title }) {
   return (
     <View style={styles.header}>
+
       <Text style={styles.title}>{title}</Text>
     </View>
   );

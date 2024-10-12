@@ -81,7 +81,6 @@ export default function Footer() {
         />
       </Tab.Navigator>
 
-      {/* Modal for Search */}
       <Modal
         animationType="fade"
         transparent={true}

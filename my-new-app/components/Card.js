@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 
 export default function Card({ title, description }) {
   return (
     <View style={styles.card}>
+    <Image source={require('../assets/google-placeholder.png')} style={styles.map} />
       <Text style={styles.cardTitle}>{title}</Text>
       <Text style={styles.cardDescription}>{description}</Text>
     </View>
@@ -11,24 +12,17 @@ export default function Card({ title, description }) {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 20,
-    marginVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: '#555',
-  },
-});
+    card: {
+      height: '80%',
+      marginTop: 20,
+      borderRadius: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+    },
+    map: {
+      width: '100%',
+      borderRadius: 8,
+    },
+  });

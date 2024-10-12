@@ -20,10 +20,14 @@ const screenOptions = {
     bottom: 0,
     left: 0,
     right: 0,
-    elevation: 0,
     height: 100,
     backgroundColor: "#f7f7f7",
     borderRadius: 100,
+    shadowColor: '#000', // Shadow color
+    shadowOffset: { width: 0, height: 0 }, // Shadow direction and depth
+    shadowOpacity: 0.7,
+    shadowRadius: 4,
+    elevation: 2,
   },
 };
 

@@ -1,15 +1,30 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import Header from './components/Header.js';
-import Map from './components/Map.js'
+import { createStackNavigator } from '@react-navigation/stack';
+import Card from './components/Card.js';
+import Footer from './components/Footer.js';
+import SearchBar from './components/Searchbar.js';
+
+const Stack = createStackNavigator();
+
+const handleSearch = (query) => {
+  if (query) {
+    const newData = data.filter(item => item.toLowerCase().includes(query.toLowerCase()));
+    setFilteredData(newData);
+  } else {
+    setFilteredData(data);
+  }
+};
 
 
 export default function App() {
+  
   return (
     <View style={styles.container}>
-      <Map />
-      <ScrollView style={styles.content}>
+      <ScrollView scrollEnabled={false} style={styles.content}>
+        <Card />
       </ScrollView>
+      <Footer style={styles.Footer}/>
     </View>
   );
 }

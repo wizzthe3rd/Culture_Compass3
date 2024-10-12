@@ -237,18 +237,27 @@ def check_token(f):
             return jsonify({'error': 'Invalid token', 'message': str(e)}), 401  # If token invalid, return error
         return f(*args, **kwargs)
     
-    
+
     return wrap
 @app.route('/test-auth', methods=['GET'])
 @check_token
 def test_auth():
-   def test_auth():
     return jsonify({'message': 'This is a response from Flask API!'})
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+import firebase_admin
+from firebase_admin import credentials, auth
+
+# Generate a custom token for a user with a specified UID
+def generate_custom_token(uid):
+    custom_token = auth.create_custom_token(uid)
+    print(f"Custom token for user {uid}: {custom_token.decode('utf-8')}")
+    return custom_token
+
+
+
 
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)
+

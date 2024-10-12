@@ -6,7 +6,7 @@ import Header from './components/Header.js';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Header title="Welcome to My App" />
+      <Header title="Welcome to My App d" />
       <ScrollView style={styles.content}>
       </ScrollView>
     </View>

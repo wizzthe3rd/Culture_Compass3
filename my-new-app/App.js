@@ -7,14 +7,13 @@ import FactsButton from './components/FactsButton.js';
 import RefocusButton from './components/RefocusButton.js';
 
 export default function App() {
-  const [refocus, setRefocus] = useState(false); // State to trigger map refocus
+  const [refocus, setRefocus] = useState(false); 
 
-  // Handler for refocusing map
   const handleRefocus = () => {
-    setRefocus(true); // Set refocus to true
+    setRefocus(true); 
     setTimeout(() => {
-      setRefocus(false); // Reset after refocusing is done
-    }, 1000); // Allow the refocus for 1 second
+      setRefocus(false); 
+    }, 1000); 
   };
 
   return (

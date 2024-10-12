@@ -51,7 +51,6 @@ export default function Footer() {
           }}
         />
         
-        {/* Search Icon with Modal */}
         <Tab.Screen 
           name="Search" 
           component={Search} 

@@ -35,20 +35,19 @@ export default function Map({ refocus }) {
         }
       );
   
-      // Check the response structure from the API and map it properly
       const places = response.data.places.map((place) => {
-        const location = place.location; // Use the correct 'location' key
+        const location = place.location; 
         return {
-          name: place.displayName.text, // Get the 'displayName.text'
-          address: place.formattedAddress, // Get the 'formattedAddress'
+          name: place.displayName.text, 
+          address: place.formattedAddress, 
           coordinates: {
-            latitude: location.latitude, // Correct access to latitude
-            longitude: location.longitude, // Correct access to longitude
+            latitude: location.latitude, 
+            longitude: location.longitude, 
           },
         };
       });
   
-      setLocations(places); // Update the locations state with the parsed data from the API
+      setLocations(places); 
       console.log('Locations:', places);
     } catch (error) {
       console.error('Error fetching data: ', error);
@@ -89,7 +88,7 @@ export default function Map({ refocus }) {
   return (
     <View style={styles.container}>
       <MapView
-        ref={mapRef} // Attach reference to the MapView
+        ref={mapRef} 
         style={styles.map}
         region={myRegion}
         onRegionChangeComplete={(region) => setMyRegion(region)}

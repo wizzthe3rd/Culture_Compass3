@@ -21,7 +21,6 @@ export default function App() {
   
   return (
     <View style={styles.container}>
-      <SearchBar />
       <ScrollView scrollEnabled={false} style={styles.content}>
         <Card />
       </ScrollView>

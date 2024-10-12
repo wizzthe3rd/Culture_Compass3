@@ -21,7 +21,8 @@ const screenOptions = {
     right: 0,
     elevation: 0,
     height: 100,
-    backgroundColor: "black",
+    backgroundColor: "#f7f7f7",
+    borderRadius: 100,
   },
 }
 
@@ -36,7 +37,7 @@ export default function Footer() {
             tabBarIcon: ({ focused }) => {
                 return (
                     <View style={{ alignItems: 'center', justifyContent: 'center'}}>
-                        <Entypo name="home" size={24} color={focused ? '#f9744d' : 'white'}/>
+                        <Entypo name="home" size={24} color={focused ? '#f9744d' : 'grey'}/>
                     </View>
                 )
             }
@@ -49,7 +50,7 @@ export default function Footer() {
             tabBarIcon: ({ focused }) => {
                 return (
                     <View style={{ alignItems: 'center', justifyContent: 'center'}}>
-                        <FontAwesome name="search" size={24} color={focused ? '#f9744d' : 'white'} />
+                        <FontAwesome name="search" size={24} color={focused ? '#f9744d' : 'grey'} />
                     </View>
                 )
             }
@@ -62,7 +63,7 @@ export default function Footer() {
             tabBarIcon: ({ focused }) => {
                 return (
                     <View style={{ alignItems: 'center', justifyContent: 'center'}}>
-                        <Fontisto name="player-settings" size={24} color={focused ? '#f9744d' : 'white'}/>                    
+                        <Fontisto name="player-settings" size={24} color={focused ? '#f9744d' : 'grey'}/>                    
                     </View>
                 )
             }

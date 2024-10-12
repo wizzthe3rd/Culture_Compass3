@@ -23,7 +23,7 @@ const SearchBar = ({ onSearch }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    padding: 15,
     marginLeft: 30,
     marginRight: 30,
     marginTop: 80,
@@ -31,11 +31,11 @@ const styles = StyleSheet.create({
     elevation: 1,
     marginVertical: 10,
     borderStyle: 'solid',
-    borderRadius: 10,
+    borderRadius: 100,
     backgroundColor: 'white',
     shadowColor: '#000',      // Shadow color
     shadowOffset: { width: 0, height: 2 },  // Offset for shadow
-    shadowOpacity: 0.8,       // Shadow opacity (0 to 1)
+    shadowOpacity: 0.4,       // Shadow opacity (0 to 1)
     shadowRadius: 3,          // Shadow blur radius
     // Android shadow (elevation)
     elevation: 5, 

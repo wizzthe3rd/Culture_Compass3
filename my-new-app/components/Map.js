@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, View, Platform } from 'react-native';
+import { Dimensions, StyleSheet, View, Platform, Text } from 'react-native';
 import React, { useState } from 'react';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 
@@ -21,7 +21,7 @@ export default function Map() {
         style={styles.map}
         region={myRegion}
         onRegionChangeComplete={(region) => setMyRegion(region)}
-        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : null}
+        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
         zoomEnabled={true}
         scrollEnabled={true}
         pitchEnabled={true}
@@ -29,12 +29,12 @@ export default function Map() {
         showUserLocation={true}
         showCompass={true}
       >
-        <Marker 
-          coordinate={{ latitude: 51.5072, longitude: -0.1276 }} // Correct coordinates
-          title={'London'}
-          description={'This is London'}
-        />
-        {console.log('Marker coordinates:', { latitude: 51.5072, longitude: -0.1276 })}
+          <Marker 
+            coordinate={{ latitude: 51.5072, longitude: -0.1276 }} // Correct coordinatesszsz
+            title={'London'}
+            description={'This is London'}
+          />
+        {/* {console.log('Marker coordinates:', { latitude: 51.5072, longitude: -0.1276 })} */}
       </MapView>
     </View>
   );

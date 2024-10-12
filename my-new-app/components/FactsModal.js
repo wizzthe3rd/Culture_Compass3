@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-const Search = () => {
+const FactsModal = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
@@ -89,8 +89,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Search;
-
-
-
-
+export default App;

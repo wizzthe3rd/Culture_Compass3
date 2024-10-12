@@ -1,14 +1,14 @@
 import { Dimensions, StyleSheet, View, Platform } from 'react-native';
 import React, { useState } from 'react';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-const windowWidth = Dimensions.get('window').width
-const windowHeight = Dimensions.get('window').height
 
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 export default function Map() {
   const initialLocation = {
     latitude: 51.5072,
-    longitude: 0.1276,
+    longitude: -0.1276, // Correct longitude for London
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
@@ -28,14 +28,14 @@ export default function Map() {
         rotateEnabled={true}
         showUserLocation={true}
         showCompass={true}
-        
-      />
-      <Marker 
-        coordinate= {{langitude: 51.5072, longitude: 0.1276}}
-
-      />
- 
-
+      >
+        <Marker 
+          coordinate={{ latitude: 51.5072, longitude: -0.1276 }} // Correct coordinates
+          title={'London'}
+          description={'This is London'}
+        />
+        {console.log('Marker coordinates:', { latitude: 51.5072, longitude: -0.1276 })}
+      </MapView>
     </View>
   );
 }
@@ -43,7 +43,7 @@ export default function Map() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    height: windowHeight, // Use the already defined constants
+    height: windowHeight,
     width: windowWidth,
   },
   map: {

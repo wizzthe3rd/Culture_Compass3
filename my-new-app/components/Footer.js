@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Entypo from '@expo/vector-icons/Entypo'; //home icon
@@ -8,9 +8,10 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import Home from './Home';
 import Settings from './Settings';
 import Search from './Search';
-
+import BlackHistoryFacts from './BlackHistoryFacts';
 
 const Tab = createBottomTabNavigator();
+
 const screenOptions = {
   tabBarShowLabel: false,
   headerShown: false,
@@ -24,66 +25,123 @@ const screenOptions = {
     backgroundColor: "#f7f7f7",
     borderRadius: 100,
   },
-}
+};
 
 export default function Footer() {
+  const [modalVisible, setModalVisible] = useState(false); // Manage modal visibility
+
   return (
     <NavigationContainer style={styles.nav}>
       <Tab.Navigator screenOptions={screenOptions} style={styles.icon}>
         <Tab.Screen 
-        name="Home" 
-        component={Home} 
-        options={{
-            tabBarIcon: ({ focused }) => {
-                return (
-                    <View style={{ alignItems: 'center', justifyContent: 'center'}}>
-                        <Entypo name="home" size={24} color={focused ? '#f9744d' : 'grey'}/>
-                    </View>
-                )
-            }
-        }}
+          name="Home" 
+          component={Home} 
+          options={{
+              tabBarIcon: ({ focused }) => {
+                  return (
+                      <View style={{ alignItems: 'center', justifyContent: 'center'}}>
+                          <Entypo name="home" size={24} color={focused ? '#f9744d' : 'grey'}/>
+                      </View>
+                  )
+              }
+          }}
         />
+        
+        {/* Search Icon with Modal */}
         <Tab.Screen 
-        name="Search" 
-        component={Search} 
-        options={{
+          name="Search" 
+          component={Search} 
+          options={{
             tabBarIcon: ({ focused }) => {
-                return (
-                    <View style={{ alignItems: 'center', justifyContent: 'center'}}>
-                        <FontAwesome name="search" size={24} color={focused ? '#f9744d' : 'grey'} />
-                    </View>
-                )
+              return (
+                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                  <TouchableOpacity
+                    onPress={() => setModalVisible(true)}  // Open modal on search icon press
+                  >
+                    <FontAwesome name="search" size={24} color={focused ? '#f9744d' : 'grey'} />
+                  </TouchableOpacity>
+                </View>
+              )
             }
-        }}
+          }}
         />
+
         <Tab.Screen 
-        name="Settings" 
-        component={Settings} 
-        options={{
-            tabBarIcon: ({ focused }) => {
-                return (
-                    <View style={{ alignItems: 'center', justifyContent: 'center'}}>
-                        <Fontisto name="player-settings" size={24} color={focused ? '#f9744d' : 'grey'}/>                    
-                    </View>
-                )
-            }
-        }}
+          name="Settings" 
+          component={Settings} 
+          options={{
+              tabBarIcon: ({ focused }) => {
+                  return (
+                      <View style={{ alignItems: 'center', justifyContent: 'center'}}>
+                          <Fontisto name="player-settings" size={24} color={focused ? '#f9744d' : 'grey'}/>                    
+                      </View>
+                  )
+              }
+          }}
         />
       </Tab.Navigator>
+
+      {/* Modal for Search */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)} // Close modal on Android back press
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Search Modal Content!</Text>
+            <Text><BlackHistoryFacts /></Text>
+            {/* Close Modal Button */}
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.buttonText}>&times;</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
-    icon:{
-        paddingTop: 70,
-    },
-  footer: {
-    backgroundColor: '',
-    alignItems: 'center',
+  icon: {
+    paddingTop: 70,
   },
-  footerText: {
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',  // Dark transparent background
+  },
+  modalView: {
+    width: 300,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 20,
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  closeButton: {
+    backgroundColor: '#F194FF',
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  buttonText: {
     color: 'white',
-    fontSize: 14,
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

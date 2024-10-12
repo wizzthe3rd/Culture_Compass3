@@ -48,7 +48,7 @@ export default function Map({ refocus }) {
         };
       });
   
-      setLocations(places); // Update the locations state with the parsed data
+      setLocations(places); // Update the locations state with the parsed data from the API
       console.log('Locations:', places);
     } catch (error) {
       console.error('Error fetching data: ', error);

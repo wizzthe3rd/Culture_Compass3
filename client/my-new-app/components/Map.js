@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Dimensions, Platform, Image } from 'react-native';
+import { StyleSheet, View, Dimensions, Platform, Image, Modal, Text, TouchableOpacity, Animated, Alert } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import cities from '../utils/cities'
 import { customDarkThemeMapStyle } from '../utils/mapUtils'
 import {SERVER_API_URL, MAPS_API_KEY, GEMINI_API_KEY} from "@env"
-console.log(`Server API URL: ${MAPS_API_KEY}`)  
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -25,7 +24,7 @@ const fetchGeminiResponse = async (prompt) => {
             ],
           },
         ],
-      }, 
+      },
       {
         headers: {
           'Content-Type': 'application/json',
@@ -33,11 +32,9 @@ const fetchGeminiResponse = async (prompt) => {
       }
     );
 
-
-    // Adjust based on the new structure
-    if (geminiResponse.data && geminiResponse.data.candidates && geminiResponse.data.candidates.length > 0 && geminiResponse.data.candidates[0].content != undefined) {
+    if (geminiResponse.data && geminiResponse.data.candidates && geminiResponse.data.candidates.length > 0 && geminiResponse.data.candidates[0].content !== undefined) {
       const resultText = geminiResponse.data.candidates[0].content.parts[0].text;
-      console.log(resultText);  // Log the extracted text
+      console.log(resultText);
       return resultText;
     } else {
       console.log('Invalid response structure:', geminiResponse.data);
@@ -45,42 +42,40 @@ const fetchGeminiResponse = async (prompt) => {
     }
   } catch (error) {
     console.error('Error fetching data: ', error.response ? error.response.data : error.message);
-    return null;  // Return null if there's an error
+    return null;
   }
 };
 
 export default function Map({ refocus }) {
   const initialLocation = {
-    latitude: 51.5072, 
+    latitude: 51.5072,
     longitude: -0.1276,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
 
-
-
   const [myRegion, setMyRegion] = useState(initialLocation);
   const [locations, setLocations] = useState([]);
-  const mapRef = useRef(null); 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [points, setPoints] = useState(0);
+  const animatedValue = useRef(new Animated.Value(1)).current;
+  const mapRef = useRef(null);
 
-  // Function to fetch the locations
   const fetchLocations = async () => {
-    const allLocations = []; 
+    const allLocations = [];
 
     try {
-      
-      // TODO ADD FUNCTIONALITY COMPONENT TO THE GEMINN RESPONSE AND REPLACE QUERY WITH PARAMETER
-
       for (const city of cities) {
         const response = await axios.get(
-          'https://maps.googleapis.com/maps/api/place/textsearch/json', 
+          'https://maps.googleapis.com/maps/api/place/textsearch/json',
           {
             params: {
-              query: `${city} Black Culture`,  
-              key: MAPS_API_KEY,  // Replace with your actual API key
-              radius: 50000, 
+              query: `${city} Black Culture`,
+              key: MAPS_API_KEY,
+              radius: 50000,
               fields: 'name,formatted_address,geometry.location,photos.photo_reference',
-            }
+            },
           }
         );
 
@@ -100,13 +95,13 @@ export default function Map({ refocus }) {
           const singleton = {
             name: place.name,
             address: place.formatted_address,
-            city: city,  
+            city: city,
             coordinates: {
               latitude: location.lat,
               longitude: location.lng,
             },
             photoUrl: photoUrl,
-            description: geminiRes,  // Store Gemini response as the description
+            description: geminiRes, // Store Gemini response as the description
           };
           // IF SERVER reset_locations_on_start flag is True, then locations databse will be empty before this code block, be careful
           /* use the one from map utils, this is depreciated
@@ -132,12 +127,10 @@ export default function Map({ refocus }) {
     }
   };
 
-
-  // Center the map on user's location
   const centerOnUserLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
-      console.log('Permission to access location was denied');
+      Alert.alert('Permission Denied', 'Permission to access location was denied');
       return;
     }
 
@@ -151,12 +144,12 @@ export default function Map({ refocus }) {
       longitudeDelta: 0.05,
     };
 
-    setMyRegion(newRegion); 
-    mapRef.current.animateToRegion(newRegion, 1); 
+    setMyRegion(newRegion);
+    mapRef.current.animateToRegion(newRegion, 1);
   };
 
   useEffect(() => {
-    fetchLocations(); 
+    fetchLocations();
   }, []);
 
   useEffect(() => {
@@ -164,6 +157,52 @@ export default function Map({ refocus }) {
       centerOnUserLocation();
     }
   }, [refocus]);
+
+  const handleMarkerPress = (location) => {
+    setSelectedLocation(location);
+    setModalVisible(true);
+  };
+
+  const isInProximity = (userLocation, targetLocation, radius = 100) => {
+    const distance = Math.sqrt(
+      Math.pow(userLocation.latitude - targetLocation.latitude, 2) +
+      Math.pow(userLocation.longitude - targetLocation.longitude, 2)
+    );
+    return distance <= radius / 100000; // converting meters to degrees (approx.)
+  };
+
+  const handleLongPress = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Permission to access location was denied');
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    const userLocation = location.coords;
+
+    if (selectedLocation && isInProximity(userLocation, selectedLocation.coordinates)) {
+      const newPoints = points + 1;
+      setPoints(newPoints);
+      Alert.alert('Points Gained!', `Total points: ${newPoints}`);
+    } else {
+      Alert.alert('No Points Gained', 'You are not in proximity to gain points.');
+    }
+  };
+
+  const handlePressIn = () => {
+    Animated.spring(animatedValue, {
+      toValue: 0.9,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(animatedValue, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
 
   return (
     <View style={styles.container}>
@@ -173,12 +212,7 @@ export default function Map({ refocus }) {
         region={myRegion}
         onRegionChangeComplete={(region) => setMyRegion(region)}
         provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
-        zoomEnabled={true}
-        scrollEnabled={true}
-        pitchEnabled={true}
-        rotateEnabled={true}
         showsUserLocation={true}
-        // customMapStyle={customDarkThemeMapStyle}
         showsCompass={true}
       >
         {locations.map((location, index) => (
@@ -186,8 +220,7 @@ export default function Map({ refocus }) {
             key={index}
             coordinate={location.coordinates}
             title={location.name}
-            description={location.description}
-            pinColor={Platform.OS === 'android' ? 'navy' : '#000000'}
+            onPress={() => handleMarkerPress(location)} // Handle marker press
           >
             {location.photoUrl && (
               <Image
@@ -198,6 +231,42 @@ export default function Map({ refocus }) {
           </Marker>
         ))}
       </MapView>
+
+      {/* Modal for displaying location details */}
+      {selectedLocation && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)} // Close modal
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>{selectedLocation.name}</Text>
+              <Text style={styles.modalDescription}>{selectedLocation.description}</Text>
+              {selectedLocation.photoUrl && (
+                <TouchableOpacity
+                  onLongPress={handleLongPress}
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                >
+                  <Animated.Image
+                    source={{ uri: selectedLocation.photoUrl }}
+                    style={[styles.modalImage, { transform: [{ scale: animatedValue }] }]}
+                  />
+                </TouchableOpacity>
+              )}
+              <Text style={styles.closeButtonText}>Hold to gain points!</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 }
@@ -209,8 +278,46 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   map: {
+    width: '100%',
+    height: '100%',
+  },
+  modalOverlay: {
     flex: 1,
-    height: windowHeight,
-    width: windowWidth,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  modalDescription: {
+    marginVertical: 10,
+    fontSize: 16,
+  },
+  modalImage: {
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
+    padding: 10,
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });

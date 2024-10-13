@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 10,
+    marginTop: 11,
     justifyContent: 'center',
     alignItems: 'center',
     height: 50,

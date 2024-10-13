@@ -53,6 +53,18 @@ export const fetchLocations = async () => {
 };
 
 
+// TO BE USED ON INSERTING NEW LOCATIONS 
+export const insertLocationsToDatabase = async () =>{
+    try {
+        const locationResponse = await axios.post(`${API_URL}/locations`, singleton); 
+        // console.log(`${API_URL}`) // Await the response
+        console.log(`Singleton : ${JSON.stringify(singleton, null, 2)}`)
+        console.log("Singleton was sent to the server \n")
+      } catch (error) {
+        console.log('Error inserting Singleton', error)
+      }          
+}
+
 
 export const centerOnUserLocation = async (mapRef, setMyRegion) => {
   let { status } = await Location.requestForegroundPermissionsAsync();
@@ -441,4 +453,5 @@ const customDarkThemeMapStyle = [
   }
 ]
 
-export default { centerOnUserLocation, fetchLocations, customDarkThemeMapStyle }
+
+export default { centerOnUserLocation, fetchLocations, customDarkThemeMapStyle, insertLocationsToDatabase }

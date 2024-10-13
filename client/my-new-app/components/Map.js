@@ -4,7 +4,7 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import cities from '../utils/cities'
-import { customDarkThemeMapStyle, insertLocationsToDatabase } from '../utils/mapUtils'
+import { customDarkThemeMapStyle } from '../utils/mapUtils'
 import {API_URL, MAPS_API_KEY, GEMINI_API_KEY} from "@env"
 
 const windowWidth = Dimensions.get('window').width;
@@ -107,7 +107,17 @@ export default function Map({ refocus }) {
             photoUrl: photoUrl,
             description: geminiRes,  // Store Gemini response as the description
           };
-        // previous insertLocationsIntoDatabase()
+          // IF SERVER reset_locations_on_start flag is True, then locations databse will be empty before this code block, be careful
+          /* 
+          try {
+            const locationResponse = await axios.post(`${API_URL}/locations`, singleton); 
+            // console.log(`${API_URL}`) // Await the response
+            console.log(`Singleton : ${JSON.stringify(singleton, null, 2)}`)
+            console.log("Singleton was sent to the server \n")
+          } catch (error) {
+            throw error // null
+          }     
+          */     
           return singleton;
         }));
         

@@ -5,6 +5,8 @@ import * as Location from 'expo-location';
 import axios from 'axios';
 import cities from '../utils/cities'
 import { customDarkThemeMapStyle } from '../utils/mapUtils'
+const API_URL = 'ENTER_API_URL'
+console.log(API_URL)
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -97,7 +99,8 @@ export default function Map({ refocus }) {
           // Fetch Gemini response
           const geminiRes = await fetchGeminiResponse(`Create a description for ${place.name}, keep it very minimalistic, no yapping, no more than 20 words.`);
 
-          return {
+          // Store singleton for location, send to location for initial population
+          const singleton = {
             name: place.name,
             address: place.formatted_address,
             city: city,  
@@ -108,7 +111,16 @@ export default function Map({ refocus }) {
             photoUrl: photoUrl,
             description: geminiRes,  // Store Gemini response as the description
           };
+          try {
+            const locationResponse = await axios.get(API_URL, singleton); 
+            console.log(`${API_URL}`) // Await the response
+            console.log(`Singleton : ${locationResponse.data} was sent to the server`);
+          } catch (error) {
+            console.error('Error in sending location data to the server:', error);
+          }          
+          return singleton;
         }));
+        
 
         allLocations.push(...places);
       }

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Auth Test</title>
+</head>
+<body>
+    <h1>Firebase Authentication Test</h1>
+
+    <!-- Form to sign in a user -->
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Sign In</button>
+    </form>
+
+    <!-- Button to sign out a user -->
+    <button id="signOutButton">Sign Out</button>
+
+    <!-- Button to test authenticated API call -->
+    <button id="testApiButton">Test API with Token</button>
+
+    <pre id="output"></pre>
+
+    <!-- Import Firebase and Authentication logic -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js"></script>
+    <script src="authservice.js"></script>
+
+    <script>
+        // Handle sign in
+        document.getElementById('loginForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            signIn(email, password)
+                .then(() => {
+                    document.getElementById('output').textContent = 'Signed in successfully';
+                })
+                .catch((error) => {
+                    document.getElementById('output').textContent = 'Error: ' + error.message;
+                });
+        });
+
+        // Handle sign out
+        document.getElementById('signOutButton').addEventListener('click', () => {
+            signOut()
+                .then(() => {
+                    document.getElementById('output').textContent = 'Signed out successfully';
+                })
+                .catch((error) => {
+                    document.getElementById('output').textContent = 'Error: ' + error.message;
+                });
+        });
+
+        // Test authenticated API call
+        document.getElementById('testApiButton').addEventListener('click', () => {
+            makeAuthenticatedRequest('http://localhost:5000/test-auth', { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('output').textContent = 'Error: ' + error.message;
+                });
+        });
+    </script>
+</body>
+</html>

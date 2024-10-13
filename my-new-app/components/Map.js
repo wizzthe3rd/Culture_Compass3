@@ -52,8 +52,10 @@ export default function Map({ refocus }) {
         }
       );
       
-      console.log(geminiResponse)
+      res = geminiResponse.data
+      console.log(res.candidates[0].content.parts[0].text)
 
+      // TODO ADD FUNCTIONALITY COMPONENT TO THE GEMINN RESPONSE AND REPLACE QUERY WITH PARAMETER
 
       for (const city of cities) {
         const response = await axios.get(

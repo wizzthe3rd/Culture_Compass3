@@ -3,13 +3,12 @@ import { StyleSheet, View, Dimensions, Platform, Image, Modal, Text, TouchableOp
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
-import cities from '../utils/cities';
+import cities from '../utils/cities'
+import { customDarkThemeMapStyle } from '../utils/mapUtils'
+import {SERVER_API_URL, MAPS_API_KEY, GEMINI_API_KEY} from "@env"
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-
-const MAPS_API_KEY = 'AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I'; // Replace with your actual API key
-const GEMINI_API_KEY = 'AIzaSyACOy0RiIrmcnRhhMfftgWUF1xhZM_EPG4'; // Replace with your actual API key
 
 const fetchGeminiResponse = async (prompt) => {
   try {
@@ -92,7 +91,8 @@ export default function Map({ refocus }) {
           // Fetch Gemini response
           const geminiRes = await fetchGeminiResponse(`Create a description for ${place.name}, keep it very minimalistic, no yapping, no more than 20 words.`);
 
-          return {
+          // Store singleton for location, send to location for initial population
+          const singleton = {
             name: place.name,
             address: place.formatted_address,
             city: city,
@@ -103,7 +103,20 @@ export default function Map({ refocus }) {
             photoUrl: photoUrl,
             description: geminiRes, // Store Gemini response as the description
           };
+          // IF SERVER reset_locations_on_start flag is True, then locations databse will be empty before this code block, be careful
+          /* use the one from map utils, this is depreciated
+          try {
+            const locationResponse = await axios.post(`${SERVER_API_URL}/locations`, singleton); 
+            // console.log(`${SERVER_API_URL}`) // Await the response
+            console.log(`Singleton : ${JSON.stringify(singleton, null, 2)}`)
+            console.log("Singleton was sent to the server \n")
+          } catch (error) {
+            throw error // null
+          }     
+          */   
+          return singleton;
         }));
+        
 
         allLocations.push(...places);
       }

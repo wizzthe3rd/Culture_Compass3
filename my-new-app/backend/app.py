@@ -10,7 +10,6 @@ from flask_cors import CORS
 from google.cloud.firestore_v1 import ArrayUnion, ArrayRemove
 from datetime import datetime
 
-
 app = Flask(__name__)
 CORS(app)
 
@@ -24,16 +23,41 @@ db = firestore.client()
 def convert_timestamp(timestamp):
     return timestamp.isoformat() if timestamp else None
 
+
+def check_token(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')  # Fetch the Authorization header
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401  # If no Authorization header, return error
+        
+        # Extracts the ID token from the Authorization header (value)
+        id_token = auth_header.split(' ').pop()
+        try:
+            # Verify the Firebase ID token using Firebase Admin SDK
+            decoded_token = auth.verify_id_token(id_token)
+            request.user = decoded_token  # Store user data for use in the request
+        except Exception as e:
+            return jsonify({'error': 'Invalid token', 'message': str(e)}), 401  # If token invalid, return error
+        return f(*args, **kwargs)
+    return wrap
+
 # Endpoint to create a user
 @app.route('/users/<user_id>', methods=['POST'])
 def create_user(user_id):
     try:
         user_data = request.json
+        username = user_data.get('username')
+        email = user_data.get('email')
         points = user_data.get('points', 0)
         user_ref = db.collection('users').document(user_id)
         user_ref.set({
             **user_data,
+            'username': username,
+            'email': email,
+            'points': points,
             'createdAt': firestore.SERVER_TIMESTAMP,
+        
             'updatedAt': firestore.SERVER_TIMESTAMP,
         })
         return jsonify({'message': f'User document has been created with ID: {user_id}'}), 200
@@ -75,17 +99,38 @@ def update_user(user_id):
 @app.route('/locations', methods=['POST'])
 def add_location():
     try:
-        location_data = request.json
+        data = request.json
+        name = data.get('name')
+        address = data.get('address')
+        city = data.get('city')
+        coordinates = data.get('coordinates', {})
+        latitude = coordinates.get('latitude')
+        longitude = coordinates.get('longitude')
+        photoUrl = data.get('photoUrl')
+
+        # Validate required fields
+        if not all([name, address, city, latitude, longitude]):
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        # Create the location document
         location_ref = db.collection('locations').document()
         location_ref.set({
-            **location_data,
+            'name': name,
+            'address': address,
+            'city': city,
+            'coordinates': {
+                'latitude': latitude,
+                'longitude': longitude,
+            },
+            'photoUrl': photoUrl,
             'createdAt': firestore.SERVER_TIMESTAMP,
             'updatedAt': firestore.SERVER_TIMESTAMP,
         })
+
         return jsonify({'message': f'Location document has been created with ID: {location_ref.id}'}), 200
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 # Endpoint to get all locations
 @app.route('/locations', methods=['GET'])
 def get_all_locations():
@@ -100,7 +145,7 @@ def get_all_locations():
             data['updatedAt'] = convert_timestamp(data.get('updatedAt'))
             locations.append(data)
         return jsonify(locations), 200
-    except Exception as e:
+    except Exception as e: 
         return jsonify({'error': str(e)}), 500
 
 # Endpoint to get a specific location
@@ -109,7 +154,7 @@ def get_location(location_id):
     try:
         location_ref = db.collection('locations').document(location_id)
         location_doc = location_ref.get()
-        if location_doc.exists:
+        if location_doc.exists():
             location_data = location_doc.to_dict()
             location_data['id'] = location_doc.id
             location_data['createdAt'] = convert_timestamp(location_data.get('createdAt'))
@@ -117,25 +162,51 @@ def get_location(location_id):
             return jsonify(location_data), 200
         else:
             return jsonify({'message': 'Location does not exist'}), 404
-    except Exception as e:
+    except Exception as e: 
         return jsonify({'error': str(e)}), 500
 
 # Endpoint to add a check-in
 @app.route('/checkins', methods=['POST'])
 def add_checkin():
-    try:
+   try:
         data = request.json
-        user_id = data['userId']
-        location_id = data['locationId']
+        
+        # Extract user and location IDs from the request data
+        user_id = data.get('userId')
+        location_id = data.get('locationId')
+
+        # Fetch the location document from Firestore based on locationId
+        location_ref = db.collection('locations').document(location_id)
+        location_doc = location_ref.get()
+
+        if not location_doc.exists():
+            return jsonify({'error': 'Location does not exist'}), 404
+
+        # Get location details from the location document
+        location_data = location_doc.to_dict()
+        location_name = location_data.get('name')
+        location_address = location_data.get('address')
+        location_coordinates = location_data.get('coordinates', {})
+        photoUrl = location_data.get('photoUrl', '')
+
+        # Add check-in document with both user and location data
         checkin_ref = db.collection('checkIns').document()
         checkin_ref.set({
             'userId': user_id,
             'locationId': location_id,
-            'timestamp': firestore.SERVER_TIMESTAMP,
+            'locationName': location_name,  # Store location name
+            'locationAddress': location_address,  # Store location address
+            'locationCoordinates': {
+                'latitude': location_coordinates.get('latitude'),
+                'longitude': location_coordinates.get('longitude'),
+            },  # Store location coordinates
+            'locationPhotoUrl': photoUrl,  # Store location photo URL
+            'timestamp': firestore.SERVER_TIMESTAMP,  # Store when the check-in occurred
         })
+
         return jsonify({'message': f'Check-in has been successfully added with ID: {checkin_ref.id}'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+   except Exception as e:
+       return jsonify({'error': str(e)}), 500
 
 # Endpoint to get check-ins by user
 @app.route('/users/<user_id>/checkins', methods=['GET'])
@@ -171,24 +242,7 @@ def get_location_checkins(location_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-def check_token(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        # Get the ID token from the Authorization header
-        id_token = request.headers.get('Authorization')
-        if not id_token:
-            return jsonify({'error': 'Authorization header missing'}), 401
-        else:
-            # Remove 'Bearer ' prefix if present
-            id_token = id_token.split(' ').pop()
-            try:
-                # Verify the ID token
-                decoded_token = auth.verify_id_token(id_token)
-                request.user = decoded_token
-            except Exception as e:
-                return jsonify({'error': 'Invalid token'}), 401
-            return f(*args, **kwargs)
-    return wrap
+
 
 # Protected route example
 @app.route('/protected-endpoint', methods=['GET'])
@@ -220,33 +274,14 @@ def home():
     return "hi"
 # Test route for authentication
 
-def check_token(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        auth_header = request.headers.get('Authorization')  # Fetch the Authorization header
-        if not auth_header:
-            return jsonify({'error': 'Authorization header missing'}), 401  # If no Authorization header, return error
-        
-        # Extract the ID token from the Authorization header
-        id_token = auth_header.split(' ').pop()
-        try:
-            # Verify the Firebase ID token using Firebase Admin SDK
-            decoded_token = auth.verify_id_token(id_token)
-            request.user = decoded_token  # Store user data for use in the request
-        except Exception as e:
-            return jsonify({'error': 'Invalid token', 'message': str(e)}), 401  # If token invalid, return error
-        return f(*args, **kwargs)
-    
 
-    return wrap
+
+
 @app.route('/test-auth', methods=['GET'])
 @check_token
 def test_auth():
     return jsonify({'message': 'This is a response from Flask API!'})
 
-
-import firebase_admin
-from firebase_admin import credentials, auth
 
 # Generate a custom token for a user with a specified UID
 def generate_custom_token(uid):

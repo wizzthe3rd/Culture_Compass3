@@ -47,3 +47,16 @@ export const makeAuthenticatedRequest = (url, options = {}) => {
     });
   });
 };
+
+
+// This function is for the google oauth sign in
+export const signInWithGoogle = async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try {
+    const result = await firebase.auth().signInWithPopup(provider);  =
+    return result;
+  } catch (error) {
+    console.error("Error signing in with Google:", error.message);
+    throw error;
+  }
+};

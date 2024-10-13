@@ -12,43 +12,43 @@ const windowHeight = Dimensions.get('window').height;
 const MAPS_API_KEY = 'AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I'
 const GEMINI_API_KEY = 'AIzaSyACOy0RiIrmcnRhhMfftgWUF1xhZM_EPG4'
 
-const fetchGeminiResponse = async (prompt) => {
-  try {
-    const geminiResponse = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt,
-              },
-            ],
-          },
-        ],
-      }, 
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+// const fetchGeminiResponse = async (prompt) => {
+//   try {
+//     const geminiResponse = await axios.post(
+//       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+//       {
+//         contents: [
+//           {
+//             parts: [
+//               {
+//                 text: prompt,
+//               },
+//             ],
+//           },
+//         ],
+//       }, 
+//       {
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     );
 
 
-    // Adjust based on the new structure
-    if (geminiResponse.data && geminiResponse.data.candidates && geminiResponse.data.candidates.length > 0 && geminiResponse.data.candidates[0].content != undefined) {
-      const resultText = geminiResponse.data.candidates[0].content.parts[0].text;
-      console.log(resultText);  // Log the extracted text
-      return resultText;
-    } else {
-      console.log('Invalid response structure:', geminiResponse.data);
-      return null;
-    }
-  } catch (error) {
-    console.error('Error fetching data: ', error.response ? error.response.data : error.message);
-    return null;  // Return null if there's an error
-  }
-};
+//     // Adjust based on the new structure
+//     if (geminiResponse.data && geminiResponse.data.candidates && geminiResponse.data.candidates.length > 0 && geminiResponse.data.candidates[0].content != undefined) {
+//       const resultText = geminiResponse.data.candidates[0].content.parts[0].text;
+//       console.log(resultText);  // Log the extracted text
+//       return resultText;
+//     } else {
+//       console.log('Invalid response structure:', geminiResponse.data);
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error('Error fetching data: ', error.response ? error.response.data : error.message);
+//     return null;  // Return null if there's an error
+//   }
+// };
 
 export default function Map({ refocus }) {
   const initialLocation = {
@@ -65,59 +65,59 @@ export default function Map({ refocus }) {
   const mapRef = useRef(null); 
 
   // Function to fetch the locations
-  const fetchLocations = async () => {
-    const allLocations = []; 
+  // const fetchLocations = async () => {
+  //   const allLocations = []; 
 
-    try {
+  //   try {
       
-      // TODO ADD FUNCTIONALITY COMPONENT TO THE GEMINN RESPONSE AND REPLACE QUERY WITH PARAMETER
+  //     // TODO ADD FUNCTIONALITY COMPONENT TO THE GEMINN RESPONSE AND REPLACE QUERY WITH PARAMETER
 
-      for (const city of cities) {
-        const response = await axios.get(
-          'https://maps.googleapis.com/maps/api/place/textsearch/json', 
-          {
-            params: {
-              query: `${city} Black Culture`,  
-              key: MAPS_API_KEY,  // Replace with your actual API key
-              radius: 50000, 
-              fields: 'name,formatted_address,geometry.location,photos.photo_reference',
-            }
-          }
-        );
+  //     for (const city of cities) {
+  //       const response = await axios.get(
+  //         'https://maps.googleapis.com/maps/api/place/textsearch/json', 
+  //         {
+  //           params: {
+  //             query: `${city} Black Culture`,  
+  //             key: MAPS_API_KEY,  // Replace with your actual API key
+  //             radius: 50000, 
+  //             fields: 'name,formatted_address,geometry.location,photos.photo_reference',
+  //           }
+  //         }
+  //       );
 
-        const places = await Promise.all(response.data.results.map(async (place) => {
-          const location = place.geometry.location;
+  //       const places = await Promise.all(response.data.results.map(async (place) => {
+  //         const location = place.geometry.location;
 
-          let photoUrl = null;
-          if (place.photos && place.photos.length > 0) {
-            const photoReference = place.photos[0].photo_reference;
-            photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${MAPS_API_KEY}`;
-          }
+  //         let photoUrl = null;
+  //         if (place.photos && place.photos.length > 0) {
+  //           const photoReference = place.photos[0].photo_reference;
+  //           photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${MAPS_API_KEY}`;
+  //         }
 
-          // Fetch Gemini response
-          const geminiRes = await fetchGeminiResponse(`Create a description for ${place.name}, keep it very minimalistic, no yapping, no more than 20 words.`);
+  //         // Fetch Gemini response
+  //         const geminiRes = await fetchGeminiResponse(`Create a description for ${place.name}, keep it very minimalistic, no yapping, no more than 20 words.`);
 
-          return {
-            name: place.name,
-            address: place.formatted_address,
-            city: city,  
-            coordinates: {
-              latitude: location.lat,
-              longitude: location.lng,
-            },
-            photoUrl: photoUrl,
-            description: geminiRes,  // Store Gemini response as the description
-          };
-        }));
+  //         return {
+  //           name: place.name,
+  //           address: place.formatted_address,
+  //           city: city,  
+  //           coordinates: {
+  //             latitude: location.lat,
+  //             longitude: location.lng,
+  //           },
+  //           photoUrl: photoUrl,
+  //           description: geminiRes,  // Store Gemini response as the description
+  //         };
+  //       }));
 
-        allLocations.push(...places);
-      }
+  //       allLocations.push(...places);
+  //     }
 
-      setLocations(allLocations);
-    } catch (error) {
-      console.error('Error fetching locations:', error.response ? error.response.data : error.message);
-    }
-  };
+  //     setLocations(allLocations);
+  //   } catch (error) {
+  //     console.error('Error fetching locations:', error.response ? error.response.data : error.message);
+  //   }
+  // };
 
 
   // Center the map on user's location
@@ -142,9 +142,9 @@ export default function Map({ refocus }) {
     mapRef.current.animateToRegion(newRegion, 1); 
   };
 
-  useEffect(() => {
-    fetchLocations(); 
-  }, []);
+  // useEffect(() => {
+  //   fetchLocations(); 
+  // }, []);
 
   useEffect(() => {
     if (refocus) {

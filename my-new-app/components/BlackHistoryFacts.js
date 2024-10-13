@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Linking, TouchableOpacity, Image } from 'react-native';
 import axios from 'axios';
 
 export default function BlackHistoryFacts() {
@@ -50,18 +50,33 @@ export default function BlackHistoryFacts() {
     );
   }
 
+  const handlePressSource = () => {
+    if (fact.source) {
+      Linking.openURL(fact.source);  // Opens the source URL in browser
+    } else {
+      console.error('No source link available.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.factContainer}>
-        <Text style={styles.factText}>Fact: {fact.text}</Text>
-        
-        <Text style={styles.sourceText}>Source: {fact.source}</Text>
-        {fact.people.length > 0 && (
-          <Text style={styles.factText}>People: {fact.people.join(', ')}</Text>
-        )}
-        {fact.tags.length > 0 && (
-          <Text style={styles.factText}>Tags: {fact.tags.join(', ')}</Text>
-        )}
+        <Text style={styles.mainText}>{fact.text}</Text>
+        <View style={styles.infoContainer}>
+          <TouchableOpacity style={styles.sourceContainer} onPress={handlePressSource}>
+            <Text style={styles.sourceText}>Source</Text>
+          </TouchableOpacity>
+          {fact.tags.length > 0 && (
+            <View style={styles.tagContainer}>
+              <Text style={styles.factText}>Tags: {fact.tags.join(', ')}</Text>
+            </View>
+          )}
+        </View>
+        <Image 
+
+          source={require('../assets/pngtree-did-you-know-black-and-white-text-png-image_232724.png')} // Adjust path as needed
+          style={styles.image}
+        />
       </View>
     </View>
   );
@@ -73,13 +88,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    maxHeight: 300,
-    backgroundColor: '#f5f5f5',
+    maxHeight: 200,
   },
   factContainer: {
-    padding: 10,
+    marginTop: 20,
     marginVertical: 5,
-    backgroundColor: '#fff',
     borderRadius: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -87,17 +100,52 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     width: '100%',
   },
-  factText: {
+  mainText: {
+    maxHeight: 100,
+    overflow: 'hidden',
     fontSize: 16,
-    color: '#333',
+    padding: 10,
+    borderRadius: 5,
+  },
+  factText: {
+    borderRadius: 10,
+    width: '100%',
+    color: 'white',
+  },
+  tagContainer: {
+    padding: 10,
+    width: 'auto',  // Use auto to adjust width based on content
     marginBottom: 5,
+    borderRadius: 10,
+    maxLength: 66,
+    backgroundColor: '#f03759',
   },
   sourceText: {
-    padding:5,
-    backgroundColor: '#12853F',
     fontSize: 14,
     borderRadius: 5,
     color: 'white',
-    marginBottom: 5,
+    textDecorationLine: 'underline', // Make it look like a clickable link
+  },
+  sourceContainer: {
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: '#12853F',
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 50,
+  },
+  image: {
+    position: 'absolute',
+    bottom: -100,
+    right: -30,
+    width: 140, // Set your desired width
+    height: 140, // Set your desired height
+    marginTop: 10, // Space between text and image
+    alignSelf: 'center', // Center the image horizontally
   },
 });

@@ -5,6 +5,7 @@ import Footer from './components/Footer.js';
 import Map from './components/Map.js';
 import FactsButton from './components/FactsButton.js';
 import RefocusButton from './components/RefocusButton.js';
+import PointsView from './components/PointsView.js';
 
 export default function App() {
   const [refocus, setRefocus] = useState(false); 
@@ -18,6 +19,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <PointsView />
       <ScrollView scrollEnabled={false} style={styles.content}>
         <FactsButton />
         <Map refocus={refocus} /> 

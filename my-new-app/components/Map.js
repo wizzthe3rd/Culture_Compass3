@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Dimensions, Platform, Image, Modal, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Dimensions, Platform, Image, Modal, Text, TouchableOpacity, Animated, Alert } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
@@ -8,8 +8,8 @@ import cities from '../utils/cities';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-const MAPS_API_KEY = 'AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I';
-const GEMINI_API_KEY = 'AIzaSyACOy0RiIrmcnRhhMfftgWUF1xhZM_EPG4';
+const MAPS_API_KEY = 'AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I'; // Replace with your actual API key
+const GEMINI_API_KEY = 'AIzaSyACOy0RiIrmcnRhhMfftgWUF1xhZM_EPG4'; // Replace with your actual API key
 
 const fetchGeminiResponse = async (prompt) => {
   try {
@@ -33,7 +33,7 @@ const fetchGeminiResponse = async (prompt) => {
       }
     );
 
-    if (geminiResponse.data && geminiResponse.data.candidates && geminiResponse.data.candidates.length > 0 && geminiResponse.data.candidates[0].content != undefined) {
+    if (geminiResponse.data && geminiResponse.data.candidates && geminiResponse.data.candidates.length > 0 && geminiResponse.data.candidates[0].content !== undefined) {
       const resultText = geminiResponse.data.candidates[0].content.parts[0].text;
       console.log(resultText);
       return resultText;
@@ -59,6 +59,8 @@ export default function Map({ refocus }) {
   const [locations, setLocations] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [points, setPoints] = useState(0);
+  const animatedValue = useRef(new Animated.Value(1)).current;
   const mapRef = useRef(null);
 
   const fetchLocations = async () => {
@@ -112,11 +114,10 @@ export default function Map({ refocus }) {
     }
   };
 
-  // Center the map on user's location
   const centerOnUserLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
-      console.log('Permission to access location was denied');
+      Alert.alert('Permission Denied', 'Permission to access location was denied');
       return;
     }
 
@@ -144,10 +145,50 @@ export default function Map({ refocus }) {
     }
   }, [refocus]);
 
-  // Handle marker press to show modal
   const handleMarkerPress = (location) => {
     setSelectedLocation(location);
     setModalVisible(true);
+  };
+
+  const isInProximity = (userLocation, targetLocation, radius = 100) => {
+    const distance = Math.sqrt(
+      Math.pow(userLocation.latitude - targetLocation.latitude, 2) +
+      Math.pow(userLocation.longitude - targetLocation.longitude, 2)
+    );
+    return distance <= radius / 100000; // converting meters to degrees (approx.)
+  };
+
+  const handleLongPress = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Permission to access location was denied');
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    const userLocation = location.coords;
+
+    if (selectedLocation && isInProximity(userLocation, selectedLocation.coordinates)) {
+      const newPoints = points + 1;
+      setPoints(newPoints);
+      Alert.alert('Points Gained!', `Total points: ${newPoints}`);
+    } else {
+      Alert.alert('No Points Gained', 'You are not in proximity to gain points.');
+    }
+  };
+
+  const handlePressIn = () => {
+    Animated.spring(animatedValue, {
+      toValue: 0.9,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(animatedValue, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
   };
 
   return (
@@ -191,8 +232,18 @@ export default function Map({ refocus }) {
               <Text style={styles.modalTitle}>{selectedLocation.name}</Text>
               <Text style={styles.modalDescription}>{selectedLocation.description}</Text>
               {selectedLocation.photoUrl && (
-                <Image source={{ uri: selectedLocation.photoUrl }} style={styles.modalImage} />
+                <TouchableOpacity
+                  onLongPress={handleLongPress}
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                >
+                  <Animated.Image
+                    source={{ uri: selectedLocation.photoUrl }}
+                    style={[styles.modalImage, { transform: [{ scale: animatedValue }] }]}
+                  />
+                </TouchableOpacity>
               )}
+              <Text style={styles.closeButtonText}>Hold to gain points!</Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setModalVisible(false)}
@@ -214,9 +265,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   map: {
-    flex: 1,
-    height: windowHeight,
-    width: windowWidth,
+    width: '100%',
+    height: '100%',
   },
   modalOverlay: {
     flex: 1,
@@ -226,33 +276,35 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '80%',
-    padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
     borderRadius: 10,
-    alignItems: 'center',
+    padding: 20,
+    elevation: 5,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
   },
   modalDescription: {
+    marginVertical: 10,
     fontSize: 16,
-    marginBottom: 10,
   },
   modalImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginBottom: 10,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
   },
   closeButton: {
-    backgroundColor: '#2196F3',
-    padding: 10,
+    marginTop: 10,
+    backgroundColor: '#007AFF',
     borderRadius: 5,
+    padding: 10,
+    alignItems: 'center',
   },
   closeButtonText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 16,
   },
 });

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
-import Card from './components/Card.js';
 import Footer from './components/Footer.js';
 import Map from './components/Map.js';
 import FactsButton from './components/FactsButton.js';
@@ -23,7 +22,7 @@ export default function App() {
       <ScrollView scrollEnabled={false} style={styles.content}>
         <FactsButton />
         <Map refocus={refocus} /> 
-      </ScrollView>
+      </ScrollView> 
       <RefocusButton onPress={handleRefocus} /> 
       <Footer style={styles.Footer}/>
     </View>

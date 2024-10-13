@@ -8,16 +8,35 @@ from functools import wraps
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv 
+
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r'/*' : {'origins':'*'}})
+
+reset_locations_on_start = True ## IMPORTANT, RESETS LOCATIONS ON START... ONLY TURN THIS ON IF WE AREN'T INSERTING LOCATIONS INTO THE DATABASE ON FRONTEND
 
  
 service_account_path = os.getenv('SERVICE_ACCOUNT_PATH')
 cred = credentials.Certificate(service_account_path)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
+
+
+# Function to delete all documents from the "locations" collection
+def delete_all_locations():
+    try:
+        locations_ref = db.collection('locations')
+        docs = locations_ref.stream()
+        for doc in docs:
+            doc.reference.delete()
+        print("All locations have been deleted.")
+    except Exception as e:
+        print(f"Error deleting locations: {str(e)}")
+
+# Delete all locations if the flag is set to True
+if reset_locations_on_start:
+    delete_all_locations()
 
 # Helper function to convert Firestore timestamp to ISO format
 def convert_timestamp(timestamp):
@@ -107,14 +126,15 @@ def add_location():
         latitude = coordinates.get('latitude')
         longitude = coordinates.get('longitude')
         photoUrl = data.get('photoUrl')
+        description = data.get('description')
 
         # Validate required fields
-        if not all([name, address, city, latitude, longitude]):
+        if not all([name, address, city, latitude, longitude, description]):
             return jsonify({'error': 'Missing required fields'}), 400
 
         # Create the location document
         location_ref = db.collection('locations').document()
-        location_ref.set({
+        singleton = {
             'name': name,
             'address': address,
             'city': city,
@@ -123,10 +143,11 @@ def add_location():
                 'longitude': longitude,
             },
             'photoUrl': photoUrl,
+            'descrpition' : description,
             'createdAt': firestore.SERVER_TIMESTAMP,
             'updatedAt': firestore.SERVER_TIMESTAMP,
-        })
-
+        }
+        location_ref.set(singleton)
         return jsonify({'message': f'Location document has been created with ID: {location_ref.id}'}), 200
 
     except Exception as e:
@@ -276,7 +297,6 @@ def home():
 
 
 
-
 @app.route('/test-auth', methods=['GET'])
 @check_token
 def test_auth():
@@ -294,5 +314,4 @@ def generate_custom_token(uid):
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=True)
-
+    app.run(host='0.0.0.0', port=5000, debug=True)

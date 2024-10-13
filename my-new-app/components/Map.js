@@ -9,6 +9,7 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const MAPS_API_KEY = 'AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I'
+const GEMINI_API_KEY = 'AIzaSyACOy0RiIrmcnRhhMfftgWUF1xhZM_EPG4'
 
 const customDarkThemeMapStyle = [
   // Your existing dark theme styles
@@ -31,6 +32,29 @@ export default function Map({ refocus }) {
     const allLocations = []; 
 
     try {
+      const geminiResponse = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, 
+        {
+          contents: [
+            {
+              parts: [
+                {
+                  text: 'Explain how AI works',
+                },
+              ],
+            },
+          ],
+        }, 
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      
+      console.log(geminiResponse)
+
+
       for (const city of cities) {
         const response = await axios.get(
           'https://maps.googleapis.com/maps/api/place/textsearch/json', 

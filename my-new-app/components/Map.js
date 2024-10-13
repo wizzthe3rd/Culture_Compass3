@@ -3,9 +3,12 @@ import { StyleSheet, View, Dimensions, Platform, Image } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
+import cities from '../utils/cities'
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
+
+const MAPS_API_KEY = 'AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I'
 
 const customDarkThemeMapStyle = [
   // Your existing dark theme styles
@@ -25,7 +28,6 @@ export default function Map({ refocus }) {
 
   // Function to fetch the locations
   const fetchLocations = async () => {
-    const cities = ['Southampton', 'London', 'Manchester', 'Birmingham', 'Liverpool', 'Leeds', 'Bristol', 'Nottingham', 'Glasgow', 'Edinburgh', 'Coventry', 'Cambridge', 'Leicester']; 
     const allLocations = []; 
 
     try {
@@ -35,7 +37,7 @@ export default function Map({ refocus }) {
           {
             params: {
               query: `${city} Black Culture`,  
-              key: 'AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I',  // Replace with your actual API key
+              key: MAPS_API_KEY,  // Replace with your actual API key
               radius: 50000, 
               fields: 'name,formatted_address,geometry.location,photos.photo_reference',
             }
@@ -132,7 +134,7 @@ export default function Map({ refocus }) {
             {location.photoUrl && (
               <Image
                 source={{ uri: location.photoUrl }}
-                style={{ width: 50, height: 50, borderRadius: 25 }}
+                style={{ width: 20, height: 20, borderRadius: 25 }}
               />
             )}
           </Marker>

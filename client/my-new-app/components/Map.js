@@ -6,6 +6,7 @@ import axios from 'axios';
 import cities from '../utils/cities'
 import { customDarkThemeMapStyle } from '../utils/mapUtils'
 import {SERVER_API_URL, MAPS_API_KEY, GEMINI_API_KEY} from "@env"
+console.log(`Server API URL: ${MAPS_API_KEY}`)  
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;

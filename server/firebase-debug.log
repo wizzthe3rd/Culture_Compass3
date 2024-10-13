@@ -1,0 +1,45 @@
+[debug] [2024-10-13T17:44:10.654Z] ----------------------------------------------------------------------
+[debug] [2024-10-13T17:44:10.657Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Torom\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init hosting
+[debug] [2024-10-13T17:44:10.658Z] CLI Version:   13.22.0
+[debug] [2024-10-13T17:44:10.658Z] Platform:      win32
+[debug] [2024-10-13T17:44:10.658Z] Node Version:  v18.18.0
+[debug] [2024-10-13T17:44:10.673Z] Time:          Sun Oct 13 2024 18:44:10 GMT+0100 (British Summer Time)
+[debug] [2024-10-13T17:44:10.674Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-10-13T17:44:10.804Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-10-13T17:44:10.805Z] > authorizing via signed-in user (torom2ssr@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\Torom\Desktop\GitHub\Culture_Compass3\server
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2024-10-13T17:44:57.001Z] Using project from CLI flag: culture-9c382
+[debug] [2024-10-13T17:44:57.008Z] Checked if tokens are valid: true, expires at: 1728845031295
+[debug] [2024-10-13T17:44:57.009Z] Checked if tokens are valid: true, expires at: 1728845031295
+[debug] [2024-10-13T17:44:57.015Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/culture-9c382 [none]
+[debug] [2024-10-13T17:44:57.937Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/culture-9c382 403
+[debug] [2024-10-13T17:44:57.937Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/culture-9c382 {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[debug] [2024-10-13T17:44:57.938Z] HTTP Error: 403, The caller does not have permission
+[debug] [2024-10-13T17:44:58.055Z] FirebaseError: HTTP Error: 403, The caller does not have permission
+    at responseToError (C:\Users\Torom\AppData\Roaming\npm\node_modules\firebase-tools\lib\responseToError.js:49:12)
+    at RetryOperation._fn (C:\Users\Torom\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:312:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[error] 
+[error] Error: Failed to get Firebase project culture-9c382. Please make sure the project exists and your account has permission to access it.

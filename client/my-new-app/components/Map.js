@@ -5,14 +5,10 @@ import * as Location from 'expo-location';
 import axios from 'axios';
 import cities from '../utils/cities'
 import { customDarkThemeMapStyle } from '../utils/mapUtils'
-const API_URL = 'ENTER_API_URL'
-console.log(API_URL)
+import {API_URL, MAPS_API_KEY, GEMINI_API_KEY} from "@env"
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-
-const MAPS_API_KEY = 'AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I'
-const GEMINI_API_KEY = 'AIzaSyACOy0RiIrmcnRhhMfftgWUF1xhZM_EPG4'
 
 const fetchGeminiResponse = async (prompt) => {
   try {

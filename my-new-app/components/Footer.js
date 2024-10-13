@@ -22,11 +22,11 @@ const screenOptions = {
     right: 0,
     height: 100,
     backgroundColor: "#f7f7f7",
-    borderRadius: 100,
+    borderRadius: 25,
     shadowColor: '#000', // Shadow color
     shadowOffset: { width: 0, height: 0 }, // Shadow direction and depth
     shadowOpacity: 0.7,
-    shadowRadius: 4,
+    shadowRadius: 2,
     elevation: 2,
   },
 };
@@ -44,7 +44,7 @@ export default function Footer() {
               tabBarIcon: ({ focused }) => {
                   return (
                       <View style={{ alignItems: 'center', justifyContent: 'center'}}>
-                          <Entypo name="home" size={24} color={focused ? '#f9744d' : 'grey'}/>
+                          <Entypo name="home" size={24} color={focused ? '#000000' : 'grey'}/>
                       </View>
                   )
               }
@@ -61,7 +61,7 @@ export default function Footer() {
                   <TouchableOpacity
                     onPress={() => setModalVisible(true)}  // Open modal on search icon press
                   >
-                    <FontAwesome name="search" size={24} color={focused ? '#f9744d' : 'grey'} />
+                    <FontAwesome name="search" size={24} color={focused ? '#000000' : 'grey'} />
                   </TouchableOpacity>
                 </View>
               )
@@ -76,7 +76,7 @@ export default function Footer() {
               tabBarIcon: ({ focused }) => {
                   return (
                       <View style={{ alignItems: 'center', justifyContent: 'center'}}>
-                          <Fontisto name="player-settings" size={24} color={focused ? '#f9744d' : 'grey'}/>                    
+                          <Fontisto name="player-settings" size={24} color={focused ? '#000000' : 'grey'}/>                    
                       </View>
                   )
               }

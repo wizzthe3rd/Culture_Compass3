@@ -4,6 +4,7 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import cities from '../utils/cities'
+import { customDarkThemeMapStyle } from '../utils/mapUtils'
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -11,9 +12,43 @@ const windowHeight = Dimensions.get('window').height;
 const MAPS_API_KEY = 'AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I'
 const GEMINI_API_KEY = 'AIzaSyACOy0RiIrmcnRhhMfftgWUF1xhZM_EPG4'
 
-const customDarkThemeMapStyle = [
-  // Your existing dark theme styles
-];
+const fetchGeminiResponse = async (prompt) => {
+  try {
+    const geminiResponse = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+      }, 
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+
+    // Adjust based on the new structure
+    if (geminiResponse.data && geminiResponse.data.candidates && geminiResponse.data.candidates.length > 0 && geminiResponse.data.candidates[0].content != undefined) {
+      const resultText = geminiResponse.data.candidates[0].content.parts[0].text;
+      console.log(resultText);  // Log the extracted text
+      return resultText;
+    } else {
+      console.log('Invalid response structure:', geminiResponse.data);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching data: ', error.response ? error.response.data : error.message);
+    return null;  // Return null if there's an error
+  }
+};
 
 export default function Map({ refocus }) {
   const initialLocation = {
@@ -22,6 +57,8 @@ export default function Map({ refocus }) {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
+
+
 
   const [myRegion, setMyRegion] = useState(initialLocation);
   const [locations, setLocations] = useState([]);
@@ -32,29 +69,7 @@ export default function Map({ refocus }) {
     const allLocations = []; 
 
     try {
-      const geminiResponse = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, 
-        {
-          contents: [
-            {
-              parts: [
-                {
-                  text: 'Explain how AI works',
-                },
-              ],
-            },
-          ],
-        }, 
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
       
-      res = geminiResponse.data
-      console.log(res.candidates[0].content.parts[0].text)
-
       // TODO ADD FUNCTIONALITY COMPONENT TO THE GEMINN RESPONSE AND REPLACE QUERY WITH PARAMETER
 
       for (const city of cities) {
@@ -70,15 +85,17 @@ export default function Map({ refocus }) {
           }
         );
 
-        const places = response.data.results.map((place) => {
+        const places = await Promise.all(response.data.results.map(async (place) => {
           const location = place.geometry.location;
 
-          // If there is a photo, construct the photo URL
           let photoUrl = null;
           if (place.photos && place.photos.length > 0) {
             const photoReference = place.photos[0].photo_reference;
-            photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I`;
+            photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${MAPS_API_KEY}`;
           }
+
+          // Fetch Gemini response
+          const geminiRes = await fetchGeminiResponse(`Create a description for ${place.name}, keep it very minimalistic, no yapping, no more than 20 words.`);
 
           return {
             name: place.name,
@@ -89,17 +106,19 @@ export default function Map({ refocus }) {
               longitude: location.lng,
             },
             photoUrl: photoUrl,
+            description: geminiRes,  // Store Gemini response as the description
           };
-        });
+        }));
 
         allLocations.push(...places);
       }
 
       setLocations(allLocations);
     } catch (error) {
-      console.error('Error fetching data: ', error.response ? error.response.data : error.message);
+      console.error('Error fetching locations:', error.response ? error.response.data : error.message);
     }
   };
+
 
   // Center the map on user's location
   const centerOnUserLocation = async () => {
@@ -146,7 +165,7 @@ export default function Map({ refocus }) {
         pitchEnabled={true}
         rotateEnabled={true}
         showsUserLocation={true}
-        customMapStyle={customDarkThemeMapStyle}
+        // customMapStyle={customDarkThemeMapStyle}
         showsCompass={true}
       >
         {locations.map((location, index) => (
@@ -154,8 +173,8 @@ export default function Map({ refocus }) {
             key={index}
             coordinate={location.coordinates}
             title={location.name}
-            description={location.address}
-            pinColor={'#000000'}
+            description={location.description}
+            pinColor={Platform.OS === 'android' ? 'navy' : '#000000'}
           >
             {location.photoUrl && (
               <Image

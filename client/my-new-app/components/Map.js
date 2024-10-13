@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import axios from 'axios';
 import cities from '../utils/cities'
 import { customDarkThemeMapStyle } from '../utils/mapUtils'
-import {API_URL, MAPS_API_KEY, GEMINI_API_KEY} from "@env"
+import {SERVER_API_URL, MAPS_API_KEY, GEMINI_API_KEY} from "@env"
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -108,16 +108,16 @@ export default function Map({ refocus }) {
             description: geminiRes,  // Store Gemini response as the description
           };
           // IF SERVER reset_locations_on_start flag is True, then locations databse will be empty before this code block, be careful
-          /* 
+          /* use the one from map utils, this is depreciated
           try {
-            const locationResponse = await axios.post(`${API_URL}/locations`, singleton); 
-            // console.log(`${API_URL}`) // Await the response
+            const locationResponse = await axios.post(`${SERVER_API_URL}/locations`, singleton); 
+            // console.log(`${SERVER_API_URL}`) // Await the response
             console.log(`Singleton : ${JSON.stringify(singleton, null, 2)}`)
             console.log("Singleton was sent to the server \n")
           } catch (error) {
             throw error // null
           }     
-          */     
+          */   
           return singleton;
         }));
         

@@ -14,14 +14,24 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={r'/*' : {'origins':'*'}})
 
-reset_locations_on_start = True ## IMPORTANT, RESETS LOCATIONS ON START... ONLY TURN THIS ON IF WE AREN'T INSERTING LOCATIONS INTO THE DATABASE ON FRONTEND
+reset_locations_on_start = False ## IMPORTANT, RESETS LOCATIONS ON START... ONLY TURN THIS ON IF WE AREN'T INSERTING LOCATIONS INTO THE DATABASE ON FRONTEND
+reset_users_on_start = True
 
- 
 service_account_path = os.getenv('SERVICE_ACCOUNT_PATH')
 cred = credentials.Certificate(service_account_path)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
+
+def delete_all_users():
+    try:
+        locations_ref = db.collection('users')
+        docs = locations_ref.stream()
+        for doc in docs:
+            doc.reference.delete()
+        print("All users have been deleted.")
+    except Exception as e:
+        print(f"Error deleting users: {str(e)}")
 
 # Function to delete all documents from the "locations" collection
 def delete_all_locations():
@@ -37,6 +47,9 @@ def delete_all_locations():
 # Delete all locations if the flag is set to True
 if reset_locations_on_start:
     delete_all_locations()
+
+if reset_users_on_start:
+    delete_all_users()
 
 # Helper function to convert Firestore timestamp to ISO format
 def convert_timestamp(timestamp):
@@ -62,21 +75,24 @@ def check_token(f):
     return wrap
 
 # Endpoint to create a user
-@app.route('/users/<user_id>', methods=['POST'])
-def create_user(user_id):
+@app.route('/auth/users', methods=['POST'])
+def create_user():
     try:
         user_data = request.json
         username = user_data.get('username')
         email = user_data.get('email')
         points = user_data.get('points', 0)
-        user_ref = db.collection('users').document(user_id)
+
+        # Generate a new user_id if not provided
+
+        # Reference the Firestore collection and set the new document
+        user_ref = db.collection('users').document()
+        user_id = user_ref.id
         user_ref.set({
-            **user_data,
             'username': username,
             'email': email,
             'points': points,
             'createdAt': firestore.SERVER_TIMESTAMP,
-        
             'updatedAt': firestore.SERVER_TIMESTAMP,
         })
         return jsonify({'message': f'User document has been created with ID: {user_id}'}), 200
@@ -84,7 +100,7 @@ def create_user(user_id):
         return jsonify({'error': str(e)}), 500
 
 # Endpoint to get a user
-@app.route('/users/<user_id>', methods=['GET'])
+@app.route('/auth/users/<user_id>', methods=['GET'])
 def get_user(user_id):
     try:
         user_ref = db.collection('users').document(user_id)
@@ -101,7 +117,7 @@ def get_user(user_id):
         return jsonify({'error': str(e)}), 500
 
 # Endpoint to update a user
-@app.route('/users/<user_id>', methods=['PUT'])
+@app.route('/auth/users/<user_id>', methods=['PUT'])
 def update_user(user_id):
     try:
         update_data = request.json
@@ -230,7 +246,7 @@ def add_checkin():
        return jsonify({'error': str(e)}), 500
 
 # Endpoint to get check-ins by user
-@app.route('/users/<user_id>/checkins', methods=['GET'])
+@app.route('/auth/users/<user_id>/checkins', methods=['GET'])
 def get_user_checkins(user_id):
     try:
         checkins_ref = db.collection('checkIns')

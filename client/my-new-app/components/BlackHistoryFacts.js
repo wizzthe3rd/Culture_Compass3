@@ -143,9 +143,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -100,
     right: -30,
-    width: 140, // Set your desired width
-    height: 140, // Set your desired height
-    marginTop: 10, // Space between text and image
-    alignSelf: 'center', // Center the image horizontally
+    width: 140, 
+    height: 140, 
+    marginTop: 10, 
+    alignSelf: 'center', 
   },
 });

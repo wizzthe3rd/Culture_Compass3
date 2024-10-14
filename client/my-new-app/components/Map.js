@@ -46,7 +46,7 @@ const fetchGeminiResponse = async (prompt) => {
   }
 };
 
-export default function Map({ refocus }) {
+export default function Map({ refocus, setPoints }) {
   const initialLocation = {
     latitude: 51.5072,
     longitude: -0.1276,
@@ -58,7 +58,6 @@ export default function Map({ refocus }) {
   const [locations, setLocations] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [points, setPoints] = useState(0);
   const animatedValue = useRef(new Animated.Value(1)).current;
   const mapRef = useRef(null);
 
@@ -182,8 +181,7 @@ export default function Map({ refocus }) {
     const userLocation = location.coords;
 
     if (selectedLocation && isInProximity(userLocation, selectedLocation.coordinates)) {
-      const newPoints = points + 1;
-      setPoints(newPoints);
+      setPoints((prevPoints) => prevPoints + 10);
       Alert.alert('Points Gained!', `Total points: ${newPoints}`);
     } else {
       Alert.alert('No Points Gained', 'You are not in proximity to gain points.');

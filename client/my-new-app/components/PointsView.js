@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-export default function PointsView({handlePointsChange }) {
-  const [points, setPoints] = useState(100)
+export default function PointsView({ points }) {
 
   return (
     <>

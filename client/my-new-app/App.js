@@ -8,6 +8,8 @@ import PointsView from './components/PointsView.js';
 
 export default function App() {
   const [refocus, setRefocus] = useState(false); 
+  const [points, setPoints] = useState(100); //moved points to App.js
+
 
   const handleRefocus = () => {
     setRefocus(true); 
@@ -18,10 +20,10 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <PointsView />
+      <PointsView points={points}/>
       <ScrollView scrollEnabled={false} style={styles.content}>
         <FactsButton />
-        <Map refocus={refocus} /> 
+        <Map refocus={refocus} setPoints={setPoints}/> 
       </ScrollView> 
       <RefocusButton onPress={handleRefocus} /> 
       <Footer style={styles.Footer}/>

@@ -87,26 +87,6 @@ export const centerOnUserLocation = async (mapRef, setMyRegion) => {
   mapRef.current.animateToRegion(newRegion, 1);
 };
 
-import axios from 'axios';
-
-// Define the dummy user data
-const dummyUser = {
-  username: 'tester',
-  email: 'tester@example.com',
-  points: 100  // Optional field with default value of 0 in the backend
-};
-
-// Make a POST request to create the user
-export const createDummyUser = async () => {
-  try {
-    const response = await axios.post(`${SERVER_API_URL}/auth/users`, dummyUser);
-    console.log('User created successfully:', response.data);
-  } catch (error) {
-    console.error('Error creating user:', error.response ? error.response.data : error.message);
-  }
-};
-
-
 const customDarkThemeMapStyle = [
   {
       "featureType": "all",
@@ -474,4 +454,4 @@ const customDarkThemeMapStyle = [
 ]
 
 
-export default { centerOnUserLocation, fetchLocations, customDarkThemeMapStyle, insertLocationsToDatabase, createDummyUser}
+export default { centerOnUserLocation, fetchLocations, customDarkThemeMapStyle, insertLocationsToDatabase}

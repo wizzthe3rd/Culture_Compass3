@@ -1,5 +1,6 @@
+// App.js
 import React, { useState } from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import Footer from './components/Footer.js';
 import Map from './components/Map.js';
 import FactsButton from './components/FactsButton.js';
@@ -7,11 +8,13 @@ import RefocusButton from './components/RefocusButton.js';
 import PointsView from './components/PointsView.js';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Leaderboard from './components/Leaderboard.js';
+import Login from './components/Login.js'; // Import the Login component
 
 export default function App() {
   const [refocus, setRefocus] = useState(false);
   const [points, setPoints] = useState(100);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Manage login state
 
   const handleRefocus = () => {
     setRefocus(true);
@@ -20,27 +23,32 @@ export default function App() {
     }, 1000);
   };
 
+  const handleLogin = () => {
+    setIsLoggedIn(true); // Change login state
+  };
+
   return (
     <View style={styles.container}>
-      <Leaderboard
-        isVisible={isModalVisible}
-        onClose={() => setModalVisible(false)}
-      />
-      {/* Points View */}
-      <PointsView points={points} />
-      {/* Custom Button to Show Leaderboard */}
-      <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
-        <FontAwesome5 name="trophy" size={24} color="white" />
-      </TouchableOpacity>
-      {/* Main Content Scroll View */}
-      <ScrollView scrollEnabled={false} style={styles.content}>
-        <FactsButton />
-        <Map refocus={refocus} setPoints={setPoints} />
-      </ScrollView>
-      {/* Refocus Button */}
-      <RefocusButton onPress={handleRefocus} />
-      {/* Footer */}
-      <Footer style={styles.footer} />
+      {isLoggedIn ? (
+        <>
+          <Leaderboard
+            isVisible={isModalVisible}
+            onClose={() => setModalVisible(false)}
+          />
+          <PointsView points={points} />
+          <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
+            <FontAwesome5 name="trophy" size={24} color="white" />
+          </TouchableOpacity>
+          <ScrollView scrollEnabled={false} style={styles.content}>
+            <FactsButton />
+            <Map refocus={refocus} setPoints={setPoints} />
+          </ScrollView>
+          <RefocusButton onPress={handleRefocus} />
+          <Footer style={styles.footer} />
+        </>
+      ) : (
+        <Login onLogin={handleLogin} /> // Render the Login component if not logged in
+      )}
     </View>
   );
 }
@@ -60,11 +68,5 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     margin: 10,
   },
-  buttonText: {
-    color: 'white',
-    marginLeft: 5,
-    fontSize: 16,
-  },
-  footer: {
-  },
+  footer: {},
 });

@@ -4,10 +4,10 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import cities from '../utils/cities'
-import { customDarkThemeMapStyle } from '../utils/mapUtils'
+import { customDarkThemeMapStyle, createDummyUser } from '../utils/mapUtils'
 import {SERVER_API_URL, MAPS_API_KEY, GEMINI_API_KEY} from "@env"
 
-const insertLocationsIntoDatabase = false;
+const insertLocationsIntoDatabase = true;
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 

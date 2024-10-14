@@ -1,7 +1,7 @@
 import axios from 'axios';
 import cities from './cities';  
 import * as Location from 'expo-location';  // Import Location API
-const API_KEY = 'AIzaSyB2LAunO5bkWrRj1H-RLB3klhDk5Cu7R-I'
+import {SERVER_API_URL, MAPS_API_KEY, GEMINI_API_KEY} from "@env"
 
 // Function to fetch the locations
 export const fetchLocations = async () => {
@@ -14,7 +14,7 @@ export const fetchLocations = async () => {
         {
           params: {
             query: `${city} Black Culture`,  
-            key: API_KEY,
+            key: MAPS_API_KEY,
             radius: 50000,
             fields: 'name,formatted_address,geometry.location,photos.photo_reference',
           }
@@ -28,7 +28,7 @@ export const fetchLocations = async () => {
         let photoUrl = null;
         if (place.photos && place.photos.length > 0) {
           const photoReference = place.photos[0].photo_reference;
-          photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${API_KEY}`;
+          photoUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${MAPS_API_KEY}`;
         }
 
         return {
@@ -56,7 +56,7 @@ export const fetchLocations = async () => {
 // TO BE USED ON INSERTING NEW LOCATIONS 
 export const insertLocationsToDatabase = async () =>{
     try {
-        const locationResponse = await axios.post(`${API_URL}/locations`, singleton); 
+        const locationResponse = await axios.post(`${SERVER_API_URL}/locations`, singleton); 
         // console.log(`${API_URL}`) // Await the response
         console.log(`Singleton : ${JSON.stringify(singleton, null, 2)}`)
         console.log("Singleton was sent to the server \n")
@@ -86,6 +86,26 @@ export const centerOnUserLocation = async (mapRef, setMyRegion) => {
   setMyRegion(newRegion);
   mapRef.current.animateToRegion(newRegion, 1);
 };
+
+import axios from 'axios';
+
+// Define the dummy user data
+const dummyUser = {
+  username: 'tester',
+  email: 'tester@example.com',
+  points: 100  // Optional field with default value of 0 in the backend
+};
+
+// Make a POST request to create the user
+export const createDummyUser = async () => {
+  try {
+    const response = await axios.post(`${SERVER_API_URL}/auth/users`, dummyUser);
+    console.log('User created successfully:', response.data);
+  } catch (error) {
+    console.error('Error creating user:', error.response ? error.response.data : error.message);
+  }
+};
+
 
 const customDarkThemeMapStyle = [
   {
@@ -454,4 +474,4 @@ const customDarkThemeMapStyle = [
 ]
 
 
-export default { centerOnUserLocation, fetchLocations, customDarkThemeMapStyle, insertLocationsToDatabase }
+export default { centerOnUserLocation, fetchLocations, customDarkThemeMapStyle, insertLocationsToDatabase, createDummyUser}

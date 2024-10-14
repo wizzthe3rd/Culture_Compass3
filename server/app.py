@@ -13,7 +13,7 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r'/*' : {'origins':'*'}})
-
+# when setting to false, make sure to set insertLocationsIntoDatabase in Map.js client side to false
 reset_locations_on_start = False ## IMPORTANT, RESETS LOCATIONS ON START... ONLY TURN THIS ON IF WE AREN'T INSERTING LOCATIONS INTO THE DATABASE ON FRONTEND
 reset_users_on_start = True
 

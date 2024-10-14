@@ -14,7 +14,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={r'/*' : {'origins':'*'}})
 
-reset_locations_on_start = True ## IMPORTANT, RESETS LOCATIONS ON START... ONLY TURN THIS ON IF WE AREN'T INSERTING LOCATIONS INTO THE DATABASE ON FRONTEND
+reset_locations_on_start = False ## IMPORTANT, RESETS LOCATIONS ON START... ONLY TURN THIS ON IF WE AREN'T INSERTING LOCATIONS INTO THE DATABASE ON FRONTEND
 
  
 service_account_path = os.getenv('SERVICE_ACCOUNT_PATH')

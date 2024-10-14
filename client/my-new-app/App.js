@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#bb7757', // Custom button color
     position: 'absolute',
-    top: 120,
+    top: 170,
     left: 15,
     zIndex: 100,
     padding: 20,

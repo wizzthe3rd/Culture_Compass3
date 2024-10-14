@@ -196,6 +196,7 @@ export default function Map({ refocus, setPoints }) {
   ref={mapRef}
   style={styles.map}
   region={myRegion}
+  pinColor={'wheat'}
   onRegionChangeComplete={(region) => setMyRegion(region)}
   provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
   showsUserLocation={true}
@@ -207,6 +208,7 @@ export default function Map({ refocus, setPoints }) {
       key={index}
       coordinate={location.coordinates}
       title={location.name}
+      pinColor={'wheat'}
       onPress={() => handleMarkerPress(location)}
     >
       {location.photoUrl && (

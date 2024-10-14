@@ -4,7 +4,7 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import cities from '../utils/cities';
-import { customDarkThemeMapStyle } from '../utils/mapUtils';
+import customDarkThemeMapStyle from '../utils/mapUtils';
 import { SERVER_API_URL, MAPS_API_KEY, GEMINI_API_KEY } from "@env";
 
 const windowWidth = Dimensions.get('window').width;
@@ -192,31 +192,32 @@ export default function Map({ refocus, setPoints }) {
 
   return (
     <View style={styles.container}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        region={myRegion}
-        onRegionChangeComplete={(region) => setMyRegion(region)}
-        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
-        showsUserLocation={true}
-        showsCompass={true}
-      >
-        {locations.map((location, index) => (
-          <Marker
-            key={index}
-            coordinate={location.coordinates}
-            title={location.name}
-            onPress={() => handleMarkerPress(location)}
-          >
-            {location.photoUrl && (
-              <Image
-                source={{ uri: location.photoUrl }}
-                style={{ width: 20, height: 20, borderRadius: 25 }}
-              />
-            )}
-          </Marker>
-        ))}
-      </MapView>
+<MapView
+  ref={mapRef}
+  style={styles.map}
+  region={myRegion}
+  onRegionChangeComplete={(region) => setMyRegion(region)}
+  provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+  showsUserLocation={true}
+  showsCompass={true}
+  customMapStyle={customDarkThemeMapStyle} 
+>
+  {locations.map((location, index) => (
+    <Marker
+      key={index}
+      coordinate={location.coordinates}
+      title={location.name}
+      onPress={() => handleMarkerPress(location)}
+    >
+      {location.photoUrl && (
+        <Image
+          source={{ uri: location.photoUrl }}
+          style={{ width: 20, height: 20, borderRadius: 25 }}
+        />
+      )}
+    </Marker>
+  ))}
+</MapView>
 
       {selectedLocation && (
         <Modal

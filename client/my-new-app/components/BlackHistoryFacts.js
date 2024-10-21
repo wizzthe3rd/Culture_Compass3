@@ -11,7 +11,7 @@ export default function BlackHistoryFacts() {
       const response = await axios.get('https://rest.blackhistoryapi.io/fact/random', {
         headers: {
           'Accept': 'application/json',
-          'x-api-key': 'aWduYXRpdXNib2F0ZW5nMTIzU2F0IE' // Replace with your actual API key
+          'x-api-key': YOURKEY // Replace with your actual API key
         }
       });
 

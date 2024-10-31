@@ -6,7 +6,7 @@ const FactsButton = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Click the button to see some facts!</Text>
+      <Text></Text>
     </View>
   );
 };

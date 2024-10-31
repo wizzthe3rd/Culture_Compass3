@@ -20,7 +20,7 @@ export default function RefocusButton({ onPress }) {
     return (
         <TouchableOpacity onPress={toggleFocus}>
             <View style={styles.container}>
-                <FontAwesome name="location-arrow" size={29} color={focused ? '#f9744d' : 'grey'} />
+                <FontAwesome name="location-arrow" size={29} color={focused ? '#bb7757' : '#bb7757'} />
             </View>
         </TouchableOpacity>
     );
